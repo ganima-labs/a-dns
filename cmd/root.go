@@ -28,6 +28,7 @@ func NewRootCmd() *cobra.Command {
 		NewDeleteRecordCmd(),
 		NewUpdateRecordCmd(),
 		NewSetupCmd(),
+		NewCertCmd(),
 	)
 
 	return cmd

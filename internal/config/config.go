@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Endpoint    string `mapstructure:"endpoint"`
 	DefaultZone string `mapstructure:"default_zone"`
+	Email       string `mapstructure:"email"`
 
 	AppKey      string `mapstructure:"app_key"`
 	AppSecret   string `mapstructure:"app_secret"`
@@ -43,5 +44,5 @@ func (c *Config) getLegacyClient() (*ovh.Client, error) {
 }
 
 func (c *Config) getOAuth2Client() (*ovh.Client, error) {
-	return ovh.NewEndpointClient(c.Endpoint)
+	return ovh.NewOAuth2Client(c.Endpoint, c.OAuth2ClientID, c.OAuth2ClientSecret)
 }

@@ -38,26 +38,33 @@ func ListZones(client *ovh.Client) ([]string, error) {
 func ListRecords(client *ovh.Client, zone, recordType, subDomain string) ([]DNSRecord, error) {
 	endpoint := fmt.Sprintf("/domain/zone/%s/record", zone)
 
-	type Filter struct {
-		FieldType string `json:"fieldType,omitempty"`
-		SubDomain string `json:"subDomain,omitempty"`
-	}
-
-	var filters []string
 	if recordType != "" {
-		filters = append(filters, "fieldType="+recordType)
+		endpoint += "?fieldType=" + recordType
 	}
 	if subDomain != "" {
-		filters = append(filters, "subDomain="+subDomain)
+		if recordType != "" {
+			endpoint += "&subDomain=" + subDomain
+		} else {
+			endpoint += "?subDomain=" + subDomain
+		}
 	}
 
-	if len(filters) > 0 {
-		endpoint += "?" + filters[0]
+	var recordIDs []int64
+	if err := client.Get(endpoint, &recordIDs); err != nil {
+		return nil, err
 	}
 
-	var records []DNSRecord
-	err := client.Get(endpoint, &records)
-	return records, err
+	records := make([]DNSRecord, 0, len(recordIDs))
+	for _, id := range recordIDs {
+		var record DNSRecord
+		detailEndpoint := fmt.Sprintf("/domain/zone/%s/record/%d", zone, id)
+		if err := client.Get(detailEndpoint, &record); err != nil {
+			continue
+		}
+		records = append(records, record)
+	}
+
+	return records, nil
 }
 
 func AddRecord(client *ovh.Client, zone, subDomain, recordType, target string, ttl int) (*DNSRecord, error) {
