@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"a-dns/internal/config"
+	"a-dns/internal/i18n"
 	"a-dns/internal/ovhclient"
 
 	"github.com/spf13/cobra"
@@ -16,7 +17,7 @@ func NewAddRecordCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "add-record [zone] [type] [target]",
-		Short: "Ajoute un enregistrement DNS",
+		Short: i18n.T("dns.add_record.short"),
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			zone = args[0]
@@ -46,9 +47,9 @@ func NewAddRecordCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&zone, "zone", "z", "", "zone DNS")
-	cmd.Flags().StringVarP(&subDomain, "subdomain", "s", "", "sous-domaine")
-	cmd.Flags().IntVarP(&ttl, "ttl", "t", 0, "TTL (par défaut: automatique)")
+	cmd.Flags().StringVarP(&zone, "zone", "z", "", i18n.T("dns.flag.zone"))
+	cmd.Flags().StringVarP(&subDomain, "subdomain", "s", "", i18n.T("flag.subdomain"))
+	cmd.Flags().IntVarP(&ttl, "ttl", "t", 0, i18n.T("flag.ttl"))
 
 	return cmd
 }

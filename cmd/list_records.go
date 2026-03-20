@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"a-dns/internal/config"
+	"a-dns/internal/i18n"
 	"a-dns/internal/ovhclient"
 
 	"github.com/spf13/cobra"
@@ -16,7 +17,7 @@ func NewListRecordsCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "list-records [zone]",
-		Short: "Liste les enregistrements DNS d'une zone",
+		Short: i18n.T("dns.list_records.short"),
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
@@ -32,7 +33,7 @@ func NewListRecordsCmd() *cobra.Command {
 				zone = cfg.DefaultZone
 			}
 			if zone == "" {
-				return fmt.Errorf("zone non spécifiée")
+				return fmt.Errorf("zone not specified")
 			}
 
 			client, err := cfg.GetOVHClient()
@@ -49,9 +50,9 @@ func NewListRecordsCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&zone, "zone", "z", "", "zone DNS (ex: ganima.xyz)")
-	cmd.Flags().StringVarP(&recordType, "type", "t", "", "type d'enregistrement (A, AAAA, CNAME, MX, TXT, etc.)")
-	cmd.Flags().StringVarP(&subDomain, "subdomain", "s", "", "sous-domaine à filtrer")
+	cmd.Flags().StringVarP(&zone, "zone", "z", "", i18n.T("dns.flag.zone"))
+	cmd.Flags().StringVarP(&recordType, "type", "t", "", i18n.T("flag.type"))
+	cmd.Flags().StringVarP(&subDomain, "subdomain", "s", "", i18n.T("flag.subdomain"))
 
 	return cmd
 }

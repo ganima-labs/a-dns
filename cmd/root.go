@@ -4,22 +4,32 @@ import (
 	"fmt"
 	"os"
 
+	"a-dns/internal/i18n"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
 var outputFormat string
+var language string
+
+func init() {
+	if err := i18n.Init("fr"); err != nil {
+		fmt.Fprintf(os.Stderr, "i18n init error: %v\n", err)
+	}
+}
 
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "a-dns",
-		Short: "CLI DNS OVH pour agent IA",
-		Long:  `CLI d'administration des zones DNS OVH, optimisé pour une utilisation par agent IA avec sortie JSON structurée.`,
+		Short: i18n.T("app.short"),
+		Long:  i18n.T("app.long"),
 	}
 
-	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "fichier de configuration (par défaut ~/.a-dns.yaml)")
-	cmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "json", "format de sortie: json, yaml, table")
+	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", i18n.T("flag.config"))
+	cmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "json", i18n.T("flag.output"))
+	cmd.PersistentFlags().StringVarP(&language, "lang", "l", "fr", "langue: fr, en, es")
 
 	cmd.AddCommand(
 		NewListZonesCmd(),
@@ -29,6 +39,7 @@ func NewRootCmd() *cobra.Command {
 		NewUpdateRecordCmd(),
 		NewSetupCmd(),
 		NewCertCmd(),
+		NewSkillCmd(),
 	)
 
 	return cmd
@@ -41,10 +52,6 @@ func Execute() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-}
-
-func init() {
-	cobra.OnInitialize(initConfig)
 }
 
 func initConfig() {
@@ -64,6 +71,9 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
-		// Config loaded successfully
+		if lang := viper.GetString("language"); lang != "" && language == "fr" {
+			language = lang
+			i18n.SetLanguage(language)
+		}
 	}
 }

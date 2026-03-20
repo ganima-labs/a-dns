@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"a-dns/internal/config"
+	"a-dns/internal/i18n"
 	"a-dns/internal/ovhclient"
 
 	"github.com/spf13/cobra"
@@ -15,7 +16,7 @@ func NewUpdateRecordCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update-record [zone] [record-id] [type] [target]",
-		Short: "Met à jour un enregistrement DNS",
+		Short: i18n.T("dns.update_record.short"),
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			zone = args[0]
@@ -46,9 +47,8 @@ func NewUpdateRecordCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&zone, "zone", "z", "", "zone DNS")
-	cmd.Flags().StringVarP(&subDomain, "subdomain", "s", "", "sous-domaine")
-	cmd.Flags().IntVarP(&ttl, "ttl", "t", 0, "TTL")
+	cmd.Flags().StringVarP(&zone, "zone", "z", "", i18n.T("dns.flag.zone"))
+	cmd.Flags().StringVarP(&subDomain, "subdomain", "s", "", i18n.T("flag.subdomain"))
 
 	return cmd
 }

@@ -293,6 +293,27 @@ Autres formats:
 
 ---
 
+## Skill pour agents IA
+
+Le CLI peut installer automatiquement sa documentation (skill) pour différents agents de codage:
+
+```bash
+# Installer pour un agent spécifique
+./a-dns skill install kilo      # Kilo (kilocode)
+./a-dns skill install claude    # Claude Code
+./a-dns skill install cursor    # Cursor IDE
+./a-dns skill install copilot   # GitHub Copilot
+./a-dns skill install aider     # Aider
+./a-dns skill install cline     # Cline (VS Code)
+
+# Installer pour tous les agents
+./a-dns skill install --all
+```
+
+La skill est installée dans `~/.<agent>/skills/a-dns/SKILL.md` et permet à l'agent de comprendre le projet et d'utiliser le CLI correctement.
+
+---
+
 ## Utilisation par agent IA
 
 ### Exemples de prompts

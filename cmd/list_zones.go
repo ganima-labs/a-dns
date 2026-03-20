@@ -10,7 +10,7 @@ import (
 func NewListZonesCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-zones",
-		Short: "Liste toutes les zones DNS disponibles",
+		Short: "List all available DNS zones",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.LoadConfig()
 			if err != nil {

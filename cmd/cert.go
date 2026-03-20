@@ -3,6 +3,7 @@ package cmd
 import (
 	"a-dns/internal/certbot"
 	"a-dns/internal/config"
+	"a-dns/internal/i18n"
 	"fmt"
 	"os"
 	"strings"
@@ -26,14 +27,14 @@ func getCertbot(cfg *config.Config) *certbot.Certbot {
 func NewCertCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cert",
-		Short: "Gestion des certificats Let's Encrypt",
-		Long:  `Commandes pour gérer les certificats SSL/TLS via Let's Encrypt avec challenge DNS OVH.`,
+		Short: i18n.T("cert.title"),
+		Long:  i18n.T("cert.title_long"),
 	}
 
-	cmd.PersistentFlags().StringVar(&certDir, "cert-dir", "", "répertoire de stockage des certificats (défaut: ~/.a-dns/certs)")
-	cmd.PersistentFlags().StringVar(&certEmail, "email", "", "email pour Let's Encrypt")
-	cmd.PersistentFlags().BoolVar(&certStaging, "staging", false, "utiliser l'environnement de test Let's Encrypt")
-	cmd.PersistentFlags().IntVar(&certRenewDays, "renew-days", 30, "renouveler si moins de X jours restants")
+	cmd.PersistentFlags().StringVar(&certDir, "cert-dir", "", i18n.T("cert.flag.cert_dir"))
+	cmd.PersistentFlags().StringVar(&certEmail, "email", "", i18n.T("cert.flag.email"))
+	cmd.PersistentFlags().BoolVar(&certStaging, "staging", false, i18n.T("cert.flag.staging"))
+	cmd.PersistentFlags().IntVar(&certRenewDays, "renew-days", 30, i18n.T("cert.flag.renew_days"))
 
 	cmd.AddCommand(
 		NewCertRequestCmd(),
@@ -48,7 +49,7 @@ func NewCertCmd() *cobra.Command {
 func NewCertRequestCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "request <domain>",
-		Short: "Demander un nouveau certificat",
+		Short: i18n.T("cert.request.short"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			domain := args[0]
@@ -63,7 +64,7 @@ func NewCertRequestCmd() *cobra.Command {
 				email = cfg.Email
 			}
 			if email == "" {
-				return fmt.Errorf("email requis (via --email ou configuration)")
+				return fmt.Errorf("%s", i18n.T("cert.error.email_required"))
 			}
 
 			dir := certDir
@@ -90,7 +91,7 @@ func NewCertRequestCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringSliceVar(&certSANs, "sans", []string{}, "Subject Alternative Names (séparés par des virgules)")
+	cmd.Flags().StringSliceVar(&certSANs, "sans", []string{}, i18n.T("cert.flag.sans"))
 
 	return cmd
 }
@@ -98,7 +99,7 @@ func NewCertRequestCmd() *cobra.Command {
 func NewCertRenewCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "renew <domain>",
-		Short: "Renouveler un certificat existant",
+		Short: i18n.T("cert.renew.short"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			domain := args[0]
@@ -113,7 +114,7 @@ func NewCertRenewCmd() *cobra.Command {
 				email = cfg.Email
 			}
 			if email == "" {
-				return fmt.Errorf("email requis (via --email ou configuration)")
+				return fmt.Errorf("%s", i18n.T("cert.error.email_required"))
 			}
 
 			dir := certDir
@@ -143,7 +144,7 @@ func NewCertRenewCmd() *cobra.Command {
 func NewCertListCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
-		Short: "Lister les certificats locaux",
+		Short: i18n.T("cert.list.short"),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.LoadConfig()
 			if err != nil {
@@ -171,7 +172,7 @@ func NewCertListCmd() *cobra.Command {
 func NewCertStatusCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "status <domain>",
-		Short: "Afficher le statut d'un certificat",
+		Short: i18n.T("cert.status.short"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			domain := args[0]
@@ -191,8 +192,8 @@ func NewCertStatusCmd() *cobra.Command {
 
 			info, err := cb.GetCertInfo(domain, dir, certRenewDays)
 			if err != nil {
-				if strings.Contains(err.Error(), "lecture certificat") {
-					return fmt.Errorf("aucun certificat trouvé pour %s", domain)
+				if strings.Contains(err.Error(), "lecture certificat") || strings.Contains(err.Error(), "reading certificate") {
+					return fmt.Errorf("%s", i18n.TWithData("cert.error.not_found", map[string]interface{}{"Domain": domain}))
 				}
 				return err
 			}

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"a-dns/internal/config"
+	"a-dns/internal/i18n"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -23,49 +24,47 @@ func NewSetupCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "setup",
-		Short: "Configure les identifiants API OVH",
-		Long: `Configuration interactive du CLI a-dns.
+		Short: i18n.T("setup.title"),
+		Long: i18n.T("setup.title") + `
 
-Deux méthodes d'authentification sont disponibles:
+` + i18n.T("setup.auth_method") + `
 
-1. OAuth2 Service Account (RECOMMANDÉ)
-   - Plus sécurisé et moderne
-   - Pas d'expiration des tokens
-   - Gestion fine des permissions via IAM
+1. ` + i18n.T("setup.method.oauth2") + `
+   - ` + i18n.T("setup.method.oauth2_desc") + `
+   - ` + i18n.T("setup.method.oauth2_iam") + `
 
-2. Application Keys (traditionnel)
-   - Méthode historique
-   - Consumer Key avec durée limitée
-   - Plus complexe à configurer
+2. ` + i18n.T("setup.method.app_keys") + `
+   - ` + i18n.T("setup.method.app_keys_desc") + `
+   - ` + i18n.T("setup.method.app_keys_ck") + `
 
-Exemples:
-  # Configuration OAuth2 interactive
+Examples:
+  # OAuth2 interactive
   ./a-dns setup -m 2
 
-  # Configuration OAuth2 en une ligne
-  ./a-dns setup -m 2 -i EU.xxxx -x secret -z domaine.com -e email@example.com
+  # OAuth2 one-liner
+  ./a-dns setup -m 2 -i EU.xxxx -x secret -z domain.com -e email@example.com
 
-  # Configuration Application Keys
-  ./a-dns setup -k APP_KEY -s APP_SECRET -c CONSUMER_KEY -z domaine.com -e email@example.com
+  # Application Keys
+  ./a-dns setup -k APP_KEY -s APP_SECRET -c CONSUMER_KEY -z domain.com -e email@example.com
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("╔══════════════════════════════════════════════════════════════╗")
-			fmt.Println("║           Configuration a-dns - CLI DNS OVH                   ║")
+			fmt.Println("║         " + i18n.T("setup.title") + "                          ║")
 			fmt.Println("╚══════════════════════════════════════════════════════════════╝")
 			fmt.Println("")
 
 			if authMethod == "" {
-				fmt.Println("Méthode d'authentification:")
+				fmt.Println(i18n.T("setup.auth_method"))
 				fmt.Println("")
-				fmt.Println("  [1] Application Keys (traditionnel)")
-				fmt.Println("      - Créer une app sur https://eu.api.ovh.com/createApp")
-				fmt.Println("      - Générer un Consumer Key avec droits DNS")
+				fmt.Println("  [1] " + i18n.T("setup.method.app_keys"))
+				fmt.Println("      - " + i18n.T("setup.method.app_keys_desc"))
+				fmt.Println("      - " + i18n.T("setup.method.app_keys_ck"))
 				fmt.Println("")
-				fmt.Println("  [2] OAuth2 Service Account (RECOMMANDÉ)")
-				fmt.Println("      - Manager OVH → Gestion des comptes → Service Accounts")
-				fmt.Println("      - Permissions IAM automatiques")
+				fmt.Println("  [2] " + i18n.T("setup.method.oauth2"))
+				fmt.Println("      - " + i18n.T("setup.method.oauth2_desc"))
+				fmt.Println("      - " + i18n.T("setup.method.oauth2_iam"))
 				fmt.Println("")
-				fmt.Print("Choix [2]: ")
+				fmt.Print(i18n.T("setup.choice_default") + ": ")
 				fmt.Scanln(&authMethod)
 				if authMethod == "" {
 					authMethod = "2"
@@ -74,11 +73,11 @@ Exemples:
 
 			if endpoint == "" {
 				fmt.Println("")
-				fmt.Println("Endpoint OVH:")
-				fmt.Println("  - ovh-eu: Europe (défaut)")
-				fmt.Println("  - ovh-ca: Canada")
-				fmt.Println("  - ovh-us: USA")
-				fmt.Print("Endpoint [ovh-eu]: ")
+				fmt.Println(i18n.T("setup.endpoint.title"))
+				fmt.Println("  - ovh-eu: " + i18n.T("setup.endpoint.eu"))
+				fmt.Println("  - ovh-ca: " + i18n.T("setup.endpoint.ca"))
+				fmt.Println("  - ovh-us: " + i18n.T("setup.endpoint.us"))
+				fmt.Print(i18n.T("setup.endpoint.prompt") + ": ")
 				fmt.Scanln(&endpoint)
 				if endpoint == "" {
 					endpoint = "ovh-eu"
@@ -94,17 +93,17 @@ Exemples:
 			if authMethod == "2" {
 				fmt.Println("")
 				fmt.Println("╔══════════════════════════════════════════════════════════════╗")
-				fmt.Println("║              OAuth2 Service Account                          ║")
+				fmt.Println("║              " + i18n.T("setup.oauth2.title") + "                          ║")
 				fmt.Println("╚══════════════════════════════════════════════════════════════╝")
 				fmt.Println("")
-				fmt.Println("ÉTAPE 1: Créer un Service Account")
-				fmt.Println("  1. Allez sur https://www.ovh.com/manager/dedicated")
-				fmt.Println("  2. Cliquez sur votre nom → Gestion des comptes")
-				fmt.Println("  3. Onglet 'Comptes de service' → Ajouter")
-				fmt.Println("  4. Nom: a-dns, Description: CLI DNS")
+				fmt.Println(i18n.T("setup.oauth2.step1"))
+				fmt.Println("  " + i18n.T("setup.oauth2.step1_1"))
+				fmt.Println("  " + i18n.T("setup.oauth2.step1_2"))
+				fmt.Println("  " + i18n.T("setup.oauth2.step1_3"))
+				fmt.Println("  " + i18n.T("setup.oauth2.step1_4"))
 				fmt.Println("")
-				fmt.Println("ÉTAPE 2: Configurer les permissions IAM")
-				fmt.Println("  Dans le compte de service → Politique IAM → Ajouter:")
+				fmt.Println(i18n.T("setup.oauth2.step2"))
+				fmt.Println("  " + i18n.T("setup.oauth2.step2_desc"))
 				fmt.Println(`  {
     "rules": [{
       "effect": "allow",
@@ -113,17 +112,17 @@ Exemples:
     }]
   }`)
 				fmt.Println("")
-				fmt.Println("ÉTAPE 3: Récupérer les credentials")
-				fmt.Println("  ⚠️  Notez le Client ID et Client Secret (affichés une seule fois)")
+				fmt.Println(i18n.T("setup.oauth2.step3"))
+				fmt.Println("  ⚠️  " + i18n.T("setup.oauth2.step3_warning"))
 				fmt.Println("")
 
 				if oauth2ClientID == "" {
-					fmt.Print("Client ID: ")
+					fmt.Print(i18n.T("setup.oauth2.client_id") + ": ")
 					fmt.Scanln(&oauth2ClientID)
 				}
 
 				if oauth2ClientSecret == "" {
-					fmt.Print("Client Secret: ")
+					fmt.Print(i18n.T("setup.oauth2.client_secret") + ": ")
 					fmt.Scanln(&oauth2ClientSecret)
 				}
 
@@ -132,19 +131,19 @@ Exemples:
 			} else {
 				fmt.Println("")
 				fmt.Println("╔══════════════════════════════════════════════════════════════╗")
-				fmt.Println("║              Application Keys (traditionnel)                 ║")
+				fmt.Println("║              " + i18n.T("setup.app_keys.title") + "                          ║")
 				fmt.Println("╚══════════════════════════════════════════════════════════════╝")
 				fmt.Println("")
-				fmt.Println("ÉTAPE 1: Créer une application")
-				fmt.Println("  Allez sur https://eu.api.ovh.com/createApp")
-				fmt.Println("  Notez l'Application Key et Application Secret")
+				fmt.Println(i18n.T("setup.app_keys.step1"))
+				fmt.Println("  " + i18n.T("setup.app_keys.step1_desc"))
+				fmt.Println("  " + i18n.T("setup.app_keys.step1_note"))
 				fmt.Println("")
-				fmt.Println("ÉTAPE 2: Générer un Consumer Key")
-				fmt.Println("  Exécutez cette commande:")
+				fmt.Println(i18n.T("setup.app_keys.step2"))
+				fmt.Println("  " + i18n.T("setup.app_keys.step2_desc"))
 				fmt.Println("")
 				fmt.Printf("  curl -X POST https://eu.api.ovh.com/1.0/auth/credential \\\n")
 				fmt.Printf("    -H 'Content-Type: application/json' \\\n")
-				fmt.Printf("    -H 'X-Ovh-Application: VOTRE_APP_KEY' \\\n")
+				fmt.Printf("    -H 'X-Ovh-Application: YOUR_APP_KEY' \\\n")
 				fmt.Printf("    -d '{\"accessRules\":[")
 				fmt.Printf("{\"method\":\"GET\",\"path\":\"/domain/zone/*\"},")
 				fmt.Printf("{\"method\":\"POST\",\"path\":\"/domain/zone/*\"},")
@@ -152,23 +151,23 @@ Exemples:
 				fmt.Printf("{\"method\":\"DELETE\",\"path\":\"/domain/zone/*\"}")
 				fmt.Printf("]}'\n")
 				fmt.Println("")
-				fmt.Println("ÉTAPE 3: Valider le Consumer Key")
-				fmt.Println("  Ouvrez l'URL 'validationUrl' retournée")
-				fmt.Println("  Connectez-vous et validez les droits")
+				fmt.Println(i18n.T("setup.app_keys.step3"))
+				fmt.Println("  " + i18n.T("setup.app_keys.step3_desc"))
+				fmt.Println("  " + i18n.T("setup.app_keys.step3_login"))
 				fmt.Println("")
 
 				if appKey == "" {
-					fmt.Print("Application Key: ")
+					fmt.Print(i18n.T("setup.app_keys.app_key") + ": ")
 					fmt.Scanln(&appKey)
 				}
 
 				if appSecret == "" {
-					fmt.Print("Application Secret: ")
+					fmt.Print(i18n.T("setup.app_keys.app_secret") + ": ")
 					fmt.Scanln(&appSecret)
 				}
 
 				if consumerKey == "" {
-					fmt.Print("Consumer Key: ")
+					fmt.Print(i18n.T("setup.app_keys.consumer_key") + ": ")
 					fmt.Scanln(&consumerKey)
 				}
 
@@ -179,16 +178,16 @@ Exemples:
 
 			if email == "" {
 				fmt.Println("")
-				fmt.Println("Email pour Let's Encrypt (notifications expiration):")
-				fmt.Print("Email: ")
+				fmt.Println(i18n.T("setup.email.title"))
+				fmt.Print(i18n.T("setup.email.prompt") + ": ")
 				fmt.Scanln(&email)
 				cfg.Email = email
 			}
 
 			if defaultZone == "" {
 				fmt.Println("")
-				fmt.Println("Zone DNS par défaut (optionnel):")
-				fmt.Print("Zone [votre-domaine.com]: ")
+				fmt.Println(i18n.T("setup.zone.title"))
+				fmt.Print(i18n.T("setup.zone.prompt") + ": ")
 				fmt.Scanln(&defaultZone)
 				if defaultZone != "" {
 					cfg.DefaultZone = defaultZone
@@ -231,18 +230,18 @@ Exemples:
 
 			fmt.Println("")
 			fmt.Println("╔══════════════════════════════════════════════════════════════╗")
-			fmt.Println("║              Configuration terminée !                        ║")
+			fmt.Println("║              " + i18n.T("setup.complete.title") + "                        ║")
 			fmt.Println("╚══════════════════════════════════════════════════════════════╝")
 			fmt.Println("")
-			fmt.Println("Fichier créé: ~/.a-dns.yaml")
+			fmt.Println(i18n.T("setup.complete.file"))
 			fmt.Println("")
-			fmt.Println("Testez la connexion:")
-			fmt.Println("  ./a-dns list-zones")
+			fmt.Println(i18n.T("setup.complete.test"))
+			fmt.Println("  " + i18n.T("setup.complete.test_cmd"))
 			fmt.Println("")
-			fmt.Println("Commandes disponibles:")
-			fmt.Println("  ./a-dns list-records <zone>")
-			fmt.Println("  ./a-dns add-record <zone> <type> <valeur>")
-			fmt.Println("  ./a-dns cert request <domain>")
+			fmt.Println(i18n.T("setup.complete.available"))
+			fmt.Println("  " + i18n.T("setup.complete.cmd_records"))
+			fmt.Println("  " + i18n.T("setup.complete.cmd_add"))
+			fmt.Println("  " + i18n.T("setup.complete.cmd_cert"))
 			fmt.Println("")
 
 			return nil
@@ -251,13 +250,13 @@ Exemples:
 
 	cmd.Flags().StringVarP(&endpoint, "endpoint", "e", "ovh-eu", "endpoint OVH (ovh-eu, ovh-ca, etc.)")
 	cmd.Flags().StringVarP(&authMethod, "method", "m", "", "méthode: 1=App Keys, 2=OAuth2")
-	cmd.Flags().StringVarP(&appKey, "app-key", "k", "", "Application Key")
-	cmd.Flags().StringVarP(&appSecret, "app-secret", "s", "", "Application Secret")
-	cmd.Flags().StringVarP(&consumerKey, "consumer-key", "c", "", "Consumer Key")
-	cmd.Flags().StringVarP(&oauth2ClientID, "oauth2-client-id", "i", "", "OAuth2 Client ID")
-	cmd.Flags().StringVarP(&oauth2ClientSecret, "oauth2-client-secret", "x", "", "OAuth2 Client Secret")
-	cmd.Flags().StringVarP(&defaultZone, "default-zone", "z", "", "Zone par défaut")
-	cmd.Flags().StringVarP(&email, "email", "", "", "Email pour Let's Encrypt")
+	cmd.Flags().StringVarP(&appKey, "app-key", "k", "", i18n.T("setup.app_keys.app_key"))
+	cmd.Flags().StringVarP(&appSecret, "app-secret", "s", "", i18n.T("setup.app_keys.app_secret"))
+	cmd.Flags().StringVarP(&consumerKey, "consumer-key", "c", "", i18n.T("setup.app_keys.consumer_key"))
+	cmd.Flags().StringVarP(&oauth2ClientID, "oauth2-client-id", "i", "", i18n.T("setup.oauth2.client_id"))
+	cmd.Flags().StringVarP(&oauth2ClientSecret, "oauth2-client-secret", "x", "", i18n.T("setup.oauth2.client_secret"))
+	cmd.Flags().StringVarP(&defaultZone, "default-zone", "z", "", i18n.T("setup.zone.title"))
+	cmd.Flags().StringVarP(&email, "email", "", "", i18n.T("cert.flag.email"))
 
 	return cmd
 }
